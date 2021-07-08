@@ -40,6 +40,98 @@ class MainActivity : AppCompatActivity() {
             if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                 // 許可されている
                 getContentsInfo()
+
+                val button_count = getCountbutton()
+                val imageUri = getUri(button_count)
+                imageView.setImageURI(imageUri)
+
+                start_button.setOnClickListener {
+                    if(playCount == true){
+                        initcount = false
+                        setCountbutton(true)
+                        val button_count = getCountbutton()
+                        val uri_count = getCounturi()
+                        //Log.d("ANDROID","ボタンカウント="+button_count+",uriカウント="+uri_count)
+                        if(button_count < uri_count){
+                            val imageUri = getUri(button_count)
+                            imageView.setImageURI(imageUri)
+                        }else{
+                            val button_count = getCountbutton()
+                            val imageUri = getUri(button_count)
+                            imageView.setImageURI(imageUri)
+                            initCountbutton(-1)
+                        }
+                        flagCount = false
+                    }
+                }
+
+                back_button.setOnClickListener {
+                    if(playCount == true){
+                        val uri_count = getCounturi()
+                        val button_count = getCountbutton()
+                        if(button_count == 0 && initcount == true){
+                            val imageUri = getUri(uri_count)
+                            imageView.setImageURI(imageUri)
+                            initCountbutton(-1)
+                            initcount = false
+                        }
+
+                        if(countButton == -1 && flagCount == false){
+                            initcount = false
+                            initCountbutton(getCounturi())
+                            setCountbutton(false)
+                            val button_count = getCountbutton()
+                            val imageUri = getUri(button_count)
+                            imageView.setImageURI(imageUri)
+                        }
+
+                        if(button_count > 0 && flagCount == false){
+                            initcount = false
+                            setCountbutton(false)
+                            val button_count = getCountbutton()
+                            val imageUri = getUri(button_count)
+                            imageView.setImageURI(imageUri)
+                        }
+                    }
+                }
+
+                play_button.setOnClickListener {
+                    if(playCount == true){
+                        playCount = false
+                        play_button.text = "停止"
+                        if (mTimer == null){
+                            mTimer = Timer()
+                            mTimer!!.schedule(object : TimerTask() {
+                                override fun run() {
+                                    mTimerSec += 0.1
+                                    mHandler.post {
+                                        setCounter(true)
+                                        val counter = getCounter()
+                                        val uri_count = getCounturi()
+                                        if(counter < uri_count){
+                                            //Log.d("ANDROID","カウント="+counter+",uriカウント="+uri_count)
+                                            val imageUri = getUri(counter)
+                                            imageView.setImageURI(imageUri)
+                                        }else{
+                                            val counter = getCounter()
+                                            val imageUri = getUri(counter)
+                                            imageView.setImageURI(imageUri)
+                                            initCounter(-1)
+                                        }
+                                    }
+                                }
+                            }, 2000, 2000) // 最初に始動させるまで100ミリ秒、ループの間隔を100ミリ秒 に設定
+                        }
+                    }else{
+                        playCount = true
+                        play_button.text = "再生"
+                        if (mTimer != null){
+                            mTimer!!.cancel()
+                            mTimer = null
+                        }
+                    }
+
+                }
             } else {
                 // 許可されていないので許可ダイアログを表示する
                 requestPermissions(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), PERMISSIONS_REQUEST_CODE)
@@ -47,98 +139,6 @@ class MainActivity : AppCompatActivity() {
             // Android 5系以下の場合
         } else {
             getContentsInfo()
-        }
-
-        val button_count = getCountbutton()
-        val imageUri = getUri(button_count)
-        imageView.setImageURI(imageUri)
-
-        start_button.setOnClickListener {
-            if(playCount == true){
-                initcount = false
-                setCountbutton(true)
-                val button_count = getCountbutton()
-                val uri_count = getCounturi()
-                //Log.d("ANDROID","ボタンカウント="+button_count+",uriカウント="+uri_count)
-                if(button_count < uri_count){
-                    val imageUri = getUri(button_count)
-                    imageView.setImageURI(imageUri)
-                }else{
-                    val button_count = getCountbutton()
-                    val imageUri = getUri(button_count)
-                    imageView.setImageURI(imageUri)
-                    initCountbutton(-1)
-                }
-                flagCount = false
-            }
-        }
-
-        back_button.setOnClickListener {
-            if(playCount == true){
-                val uri_count = getCounturi()
-                val button_count = getCountbutton()
-                if(button_count == 0 && initcount == true){
-                    val imageUri = getUri(uri_count)
-                    imageView.setImageURI(imageUri)
-                    initCountbutton(-1)
-                    initcount = false
-                }
-
-                if(countButton == -1 && flagCount == false){
-                    initcount = false
-                    initCountbutton(getCounturi())
-                    setCountbutton(false)
-                    val button_count = getCountbutton()
-                    val imageUri = getUri(button_count)
-                    imageView.setImageURI(imageUri)
-                }
-
-                if(button_count > 0 && flagCount == false){
-                    initcount = false
-                    setCountbutton(false)
-                    val button_count = getCountbutton()
-                    val imageUri = getUri(button_count)
-                    imageView.setImageURI(imageUri)
-                }
-            }
-        }
-
-        play_button.setOnClickListener {
-            if(playCount == true){
-                playCount = false
-                play_button.text = "停止"
-                if (mTimer == null){
-                    mTimer = Timer()
-                    mTimer!!.schedule(object : TimerTask() {
-                        override fun run() {
-                            mTimerSec += 0.1
-                            mHandler.post {
-                                setCounter(true)
-                                val counter = getCounter()
-                                val uri_count = getCounturi()
-                                if(counter < uri_count){
-                                    //Log.d("ANDROID","カウント="+counter+",uriカウント="+uri_count)
-                                    val imageUri = getUri(counter)
-                                    imageView.setImageURI(imageUri)
-                                }else{
-                                    val counter = getCounter()
-                                    val imageUri = getUri(counter)
-                                    imageView.setImageURI(imageUri)
-                                    initCounter(-1)
-                                }
-                            }
-                        }
-                    }, 2000, 2000) // 最初に始動させるまで100ミリ秒、ループの間隔を100ミリ秒 に設定
-                }
-            }else{
-                playCount = true
-                play_button.text = "再生"
-                if (mTimer != null){
-                    mTimer!!.cancel()
-                    mTimer = null
-                }
-            }
-
         }
 
     }
@@ -152,6 +152,7 @@ class MainActivity : AppCompatActivity() {
                 }
         }
     }
+
 
     private fun getContentsInfo()  {
         // 画像の情報を取得する
